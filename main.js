@@ -12,6 +12,7 @@
 
 /* --- GLOBAL VARIABLES --- */
 var gameStateNumber = 0;
+var gridSize = 30;
 var keys = [];
 var mouseOverButton = "";
 var txtColor1 = 0;
@@ -128,7 +129,7 @@ var drawBlocks = function() {
 /* --- NINJAS --- */
 var ninjaPos = {
     x: 200, 
-    y: 200
+    y: 100
 };
 var Ninja = function(ninjaType, x, y, size, rot, speedMarks) {
     this.ninjaType = ninjaType;
@@ -142,19 +143,21 @@ var Ninja = function(ninjaType, x, y, size, rot, speedMarks) {
     this.speedMarks = speedMarks;
 };
 Ninja.prototype.update = function() {
-    if(canFall) {
-        this.yv+=this.moveSpeed;
-    }
+    this.yv+=this.moveSpeed;
     if(keys[LEFT] === true) {
         this.xv-=this.moveSpeed;
     }
     if(keys[RIGHT] === true) {
         this.xv+=this.moveSpeed;
     }
-    ninjaPos.x += this.xv;
+    this.x += this.xv;
     this.collideWith(this.xv, 0);
-    ninjaPos.y += this.yv;
+    canFall = true;
+    this.y += this.yv;
     this.collideWith(0, this.yv);
+    
+    ninjaPos.x = this.x;
+    ninjaPos.y = this.y;
 };
 Ninja.prototype.display = function() {
     switch(this.ninjaType) {
@@ -207,28 +210,28 @@ Ninja.prototype.collideWith = function(xv, yv) {
         } else {
             canFall = true;
         }*/
-        if( this.y + 30 > o.y && this.y < o.y + 15 && this.x + 15 > o.x && this.x < o.x + 15) {
+        if( this.y + gridSize > o.y && this.y < o.y + gridSize && this.x + gridSize > o.x && this.x < o.x + gridSize) {
             // BOTTOM
             if(yv > 0) {
                 yv = 0;
                 canFall = false;
-                this.y = o.y-15;
+                this.y = o.y - gridSize;
             }
             // TOP
             if(yv < 0) {
                 yv = 0;
                 canFall = true;
-                this.y = o.y + 15;
+                this.y = o.y + gridSize;
             }
             // RIGHT
             if(xv > 0) {
                 xv = 0;
-                this.x = o.x - 15;
+                this.x = o.x - gridSize;
             }
             // LEFT
             if(xv < 0) {
                 xv = 0;
-                this.x = o.x + 15;
+                this.x = o.x + gridSize;
             }
         }
     }
@@ -472,13 +475,15 @@ var level01 = function() {
     
     var ninja1 = new Ninja(1, ninjaPos.x, ninjaPos.y, 50, 0);
     ninja1.update();
-    ninja1.display();
     
     // Blocks
     addBlock(200, 250);
     addBlock(230, 250);
     addBlock(170, 250);
+    addBlock(170, 220);
     drawBlocks();
+    
+    ninja1.display();
     
     textFill = "Physics Engine Test";
     if(textScroller.length !== textFill.length && frameCount % 3 === 0 && time ) {
