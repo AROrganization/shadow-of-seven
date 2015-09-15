@@ -16,7 +16,7 @@ var keys = [];
 var mouseOverButton = "";
 var txtColor1 = 0;
 var txtColorFin = 255;
-var time = 0;
+var time = 1450;
 var waitDelay = 255;
 var textScroller = "";
 var textFill = "";
@@ -145,15 +145,16 @@ Ninja.prototype.update = function() {
     if(canFall) {
         this.yv+=this.moveSpeed;
     }
-    if(canMoveLeft && keys[LEFT] === true) {
+    if(keys[LEFT] === true) {
         this.xv-=this.moveSpeed;
     }
-    if(canMoveRight && keys[RIGHT] === true) {
+    if(keys[RIGHT] === true) {
         this.xv+=this.moveSpeed;
     }
     ninjaPos.x += this.xv;
+    this.collideWith(this.xv, 0);
     ninjaPos.y += this.yv;
-    this.collideWith();
+    this.collideWith(0, this.yv);
 };
 Ninja.prototype.display = function() {
     switch(this.ninjaType) {
@@ -188,10 +189,10 @@ Ninja.prototype.display = function() {
             break;
     }
 };
-Ninja.prototype.collideWith = function() {
+Ninja.prototype.collideWith = function(xv, yv) {
     for(var i = 0; i < blocks.length; i++) {
         var o = blocks[i];
-        if(ninjaPos.x - o.x <= 30 && ninjaPos.x - o.x >= 0 && abs(ninjaPos.y - o.y) <= 29) {
+        /*if(ninjaPos.x - o.x <= 30 && ninjaPos.x - o.x >= 0 && abs(ninjaPos.y - o.y) <= 29) {
             canMoveLeft = false;
         } else {
             canMoveLeft = true;
@@ -205,28 +206,28 @@ Ninja.prototype.collideWith = function() {
             canFall = false;
         } else {
             canFall = true;
-        }
-        if( this.y + 15 > o.y && this.y < o.y + 15 && this.x + 15 > o.x && this.x < o.x + 15) {
+        }*/
+        if( this.y + 30 > o.y && this.y < o.y + 15 && this.x + 15 > o.x && this.x < o.x + 15) {
             // BOTTOM
-            if(this.yv > 0) {
-                this.yv = 0;
+            if(yv > 0) {
+                yv = 0;
                 canFall = false;
                 this.y = o.y-15;
             }
             // TOP
-            if(this.yv < 0) {
-                this.yv = 0;
+            if(yv < 0) {
+                yv = 0;
                 canFall = true;
                 this.y = o.y + 15;
             }
             // RIGHT
-            if(this.xv > 0) {
-                this.xv = 0;
+            if(xv > 0) {
+                xv = 0;
                 this.x = o.x - 15;
             }
             // LEFT
-            if(this.xv < 0) {
-                this.xv = 0;
+            if(xv < 0) {
+                xv = 0;
                 this.x = o.x + 15;
             }
         }
@@ -309,7 +310,7 @@ var credits = function() {
     text("Credits", 201, 50);
     
     textSize(20);
-    text("Thanks to my collab team for helping\nme design the game. Here is a list\nof the people who did:\nSatisifed Soul, KCF, codeWizard, Elijah,\nEmory, KingKhan007, Ignatio,\nJavaLava, Julian, Muhib Hussain,\nRobot, and Fazbear! \n\nEveryone else is listed on the collab\nsite.", 201, 220);
+    text("Thanks to my collab team for helping\nme design the game. Here is a list\nof the people who did:\nSatisifed Soul, KCF, codeWizard, Elijah,\nEmory, KingKhan007, Ignatio,\nJavaLava, Julian, Muhib Hussain,\nRobot, Blaze, I Am Julian and Fazbear! \n\nEveryone else is listed on the collab\nsite.", 201, 220);
     
     button(70, 370, 130, 33, 10, "Back", 24, color(0, 0, 0), color(82, 82, 82), color(255, 255, 255), color(200, 200, 200, 100), color(0, 0, 0, 100), 2, color(0, 0, 0, 100), 2);
 };
@@ -506,7 +507,9 @@ keyReleased = function() {
 mouseReleased = function() {
     switch(mouseOverButton) {
         case "Play":
-            gameStateNumber = 3;
+            if(gameStateNumber === 0) {
+                gameStateNumber = 3;
+            }
             break;
         case "Options":
             gameStateNumber = 1;
@@ -524,7 +527,7 @@ mouseReleased = function() {
 draw = function() {
     frameRate(60);
     switch(gameStateNumber) {
-        case 0: // When gameStateNumber equals 0, draw the menu, this is by default
+        case 0:
             menu();
             break;
         case 1:
@@ -533,7 +536,7 @@ draw = function() {
         case 2:
             credits();
             break;
-        case 3: // When gameStateNumber equals 3, draw the first level
+        case 3:
             intro();
             break;
         case 4:
