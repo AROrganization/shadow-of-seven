@@ -13,6 +13,7 @@
 /* --- GLOBAL VARIABLES --- */
 var gameStateNumber = 0;
 var gridSize = 30;
+var levelGen = true;
 var keys = [];
 var mouseOverButton = "";
 var txtColor1 = 0;
@@ -144,11 +145,16 @@ var Ninja = function(ninjaType, x, y, size, rot, speedMarks) {
 };
 Ninja.prototype.update = function() {
     this.yv+=this.moveSpeed;
-    if(keys[LEFT] === true) {
+    if(keys[LEFT]) {
         this.xv-=this.moveSpeed;
+        this.speedMarks = true;
     }
-    if(keys[RIGHT] === true) {
+    if(keys[RIGHT]) {
         this.xv+=this.moveSpeed;
+        this.speedMarks = true;
+    }
+    if(keys[UP]) {
+        this.yv-=this.moveSpeed;
     }
     this.x += this.xv;
     this.collideWith(this.xv, 0);
@@ -166,7 +172,11 @@ Ninja.prototype.display = function() {
             noStroke();
             pushMatrix();
                 translate(this.x, this.y);
-                scale(this.size / 100);
+                if(keys[LEFT]) {
+                    scale(-this.size / 100, this.size / 100);
+                } else {
+                    scale(this.size / 100);
+                }
                 rotate(this.rot);
                 fill(0, 0, 0);
                 rect(0, 0, 60, 60, 10);
@@ -181,7 +191,11 @@ Ninja.prototype.display = function() {
             if(this.speedMarks) {
                 pushMatrix();
                     translate(this.x, this.y);
-                    scale(this.size / 100);
+                    if(keys[LEFT]) {
+                        scale(-this.size / 100, this.size / 100);
+                    } else {
+                        scale(this.size / 100);
+                    }
                     rotate(this.rot);
                     fill(255, 255, 255);
                     rect(-80, -20, 60, 3);
@@ -195,21 +209,6 @@ Ninja.prototype.display = function() {
 Ninja.prototype.collideWith = function(xv, yv) {
     for(var i = 0; i < blocks.length; i++) {
         var o = blocks[i];
-        /*if(ninjaPos.x - o.x <= 30 && ninjaPos.x - o.x >= 0 && abs(ninjaPos.y - o.y) <= 29) {
-            canMoveLeft = false;
-        } else {
-            canMoveLeft = true;
-        }
-        if(o.x - ninjaPos.x <= 15 && o.x - ninjaPos.x >= 0 && abs(ninjaPos.y - o.y) <= 29) {
-            canMoveRight = false;
-        } else {
-            canMoveRight = true;
-        }
-        if(o.y - ninjaPos.y <= 30 && o.y - ninjaPos.y >= 0 && abs(ninjaPos.x - o.x) <= 30) {
-            canFall = false;
-        } else {
-            canFall = true;
-        }*/
         if( this.y + gridSize > o.y && this.y < o.y + gridSize && this.x + gridSize > o.x && this.x < o.x + gridSize) {
             // BOTTOM
             if(yv > 0) {
@@ -237,6 +236,34 @@ Ninja.prototype.collideWith = function(xv, yv) {
     }
 };
 var menuNinja = new Ninja(1, 135, 265, 100, 11, true);
+
+/* --- LEVEL MANAGEMENT --- */
+var LevelOne = [
+    ["####################"],
+    ["#                  #"],
+    ["#                  #"],
+    ["#                  #"],
+    ["#                  #"],
+    ["#                  #"],
+    ["#                  #"],
+    ["#                  #"],
+    ["#   P              #"],
+    ["####################"],
+];
+var generateLevel = function(level) {
+    for(var i = 0; i < level.length; i++) {
+        for(var j = 0; j < level[i][0].length; j++) {
+            var symbol = level[i][0][j];
+            if(symbol === "#") {
+                // Platform arguments: X, Y, Width, Height
+                addBlock(j*gridSize, i*gridSize);
+            } else if (symbol === "P") {
+                ninjaPos.x = j*width/gridSize;
+                ninjaPos.y = i*height/gridSize;
+            }
+        }
+    }
+};
 
 /* --- SLIDES --- */
 var menu = function() {
@@ -473,16 +500,19 @@ var level01 = function() {
     background(82, 82, 82);
     noStroke();
     
-    var ninja1 = new Ninja(1, ninjaPos.x, ninjaPos.y, 50, 0);
-    ninja1.update();
-    
     // Blocks
-    addBlock(200, 250);
+    /*addBlock(200, 250);
     addBlock(230, 250);
     addBlock(170, 250);
     addBlock(170, 220);
+    drawBlocks();*/
+    if(levelGen) {
+        generateLevel(LevelOne);
+        levelGen = false;
+    }
+    var ninja1 = new Ninja(1, ninjaPos.x, ninjaPos.y, 50, 0);
+    ninja1.update();
     drawBlocks();
-    
     ninja1.display();
     
     textFill = "Physics Engine Test";
