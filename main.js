@@ -23,10 +23,6 @@ var waitDelay = 255;
 var textScroller = "";
 var textFill = "";
 var textEff = 0;
-var canMoveLeft = true;
-var canMoveRight = true;
-var canJump = true;
-var canFall = true;
 
 /* --- KCF.JS --- Minified Version --- */
 var poly=function(array){beginShape();for(var i=0;i<array.length;i++){vertex(array[i][0],array[i][1]);}
@@ -142,6 +138,7 @@ var Ninja = function(ninjaType, x, y, size, rot, speedMarks) {
     this.size = size;
     this.rot = rot;
     this.speedMarks = speedMarks;
+    this.canFall = true;
 };
 Ninja.prototype.update = function() {
     this.yv+=this.moveSpeed;
@@ -154,11 +151,11 @@ Ninja.prototype.update = function() {
         this.speedMarks = true;
     }
     if(keys[UP]) {
-        this.yv-=this.moveSpeed;
+        this.yv-=8;
     }
     this.x += this.xv;
     this.collideWith(this.xv, 0);
-    canFall = true;
+    this.canFall = true;
     this.y += this.yv;
     this.collideWith(0, this.yv);
     
@@ -213,13 +210,13 @@ Ninja.prototype.collideWith = function(xv, yv) {
             // BOTTOM
             if(yv > 0) {
                 yv = 0;
-                canFall = false;
+                this.canFall = false;
                 this.y = o.y - gridSize;
             }
             // TOP
             if(yv < 0) {
                 yv = 0;
-                canFall = true;
+                this.canFall = true;
                 this.y = o.y + gridSize;
             }
             // RIGHT
@@ -239,16 +236,16 @@ var menuNinja = new Ninja(1, 135, 265, 100, 11, true);
 
 /* --- LEVEL MANAGEMENT --- */
 var LevelOne = [
-    ["####################"],
-    ["#                  #"],
-    ["#                  #"],
-    ["#                  #"],
-    ["#                  #"],
-    ["#                  #"],
-    ["#                  #"],
-    ["#                  #"],
-    ["#   P              #"],
-    ["####################"],
+    ["##############"],
+    ["#            #"],
+    ["#            #"],
+    ["#            #"],
+    ["#            #"],
+    ["#            #"],
+    ["#        #   #"],
+    ["#            #"],
+    ["#   P        #"],
+    ["##############"],
 ];
 var generateLevel = function(level) {
     for(var i = 0; i < level.length; i++) {
