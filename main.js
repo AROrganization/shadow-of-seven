@@ -31,6 +31,7 @@ endShape();};var rectGradient=function(x,y,width,height,from,to){for(var i=0;i<w
 /* --- BUTTON FUNCTION --- */
 var button = function(x, y, wid, hei, radius, tex, textSi, textFill, hoverTextFill, fi, hoverFi, stro, stroWei, hoverStro, hoverStroWei) {
     if(abs(x - mouseX) <= wid / 2 && abs(y - mouseY) <= hei / 2) {
+        cursor(HAND);
         if(mouseIsPressed) {
             mouseOverButton = tex;
         }
@@ -132,6 +133,8 @@ var Ninja = function(ninjaType, x, y, size, rot, speedMarks) {
     this.ninjaType = ninjaType;
     this.x = x;
     this.y = y;
+    this.spawnX = 0;
+    this.spawnY = 0;
     this.xv = 0;
     this.yv = 0;
     this.moveSpeed = 5;
@@ -149,9 +152,6 @@ Ninja.prototype.update = function() {
     if(keys[RIGHT]) {
         this.xv+=this.moveSpeed;
         this.speedMarks = true;
-    }
-    if(keys[UP]) {
-        this.yv-=8;
     }
     this.x += this.xv;
     this.collideWith(this.xv, 0);
@@ -212,6 +212,9 @@ Ninja.prototype.collideWith = function(xv, yv) {
                 yv = 0;
                 this.canFall = false;
                 this.y = o.y - gridSize;
+                if(keys[UP]) {
+                    this.yv-=8;
+                }
             }
             // TOP
             if(yv < 0) {
@@ -244,7 +247,11 @@ var LevelOne = [
     ["#            #"],
     ["#        #   #"],
     ["#            #"],
-    ["#   P        #"],
+    ["#            #"],
+    ["#            #"],
+    ["#      ###   #"],
+    ["#            #"],
+    ["#  P         #"],
     ["##############"],
 ];
 var generateLevel = function(level) {
@@ -558,6 +565,7 @@ mouseReleased = function() {
 /* --- DRAW --- */
 draw = function() {
     frameRate(60);
+    cursor();
     switch(gameStateNumber) {
         case 0:
             menu();
